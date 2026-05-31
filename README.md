@@ -8,9 +8,7 @@ pricing.
 [![CI](https://github.com/promptrails/modelsdotdev-go/actions/workflows/ci.yml/badge.svg)](https://github.com/promptrails/modelsdotdev-go/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/promptrails/modelsdotdev-go)](https://goreportcard.com/report/github.com/promptrails/modelsdotdev-go)
 
-The Go counterpart to Vercel's
-[`modelsdotdev-python`](https://github.com/vercel-labs/modelsdotdev-python):
-typed structs over `https://models.dev/api.json`, an in-memory catalog with
+Typed structs over `https://models.dev/api.json`, an in-memory catalog with
 lookup/filter helpers, an HTTP client with TTL caching, and an embedded offline
 snapshot so it works with no network at all.
 
