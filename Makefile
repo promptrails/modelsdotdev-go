@@ -1,4 +1,4 @@
-.PHONY: all build test lint fmt vet coverage clean update-bundle
+.PHONY: all build test lint fmt vet coverage clean
 
 all: fmt vet lint test build
 
@@ -27,11 +27,6 @@ fmt:
 ## Run go vet
 vet:
 	go vet ./...
-
-## Refresh the embedded offline snapshot from models.dev
-update-bundle:
-	curl -fsSL https://models.dev/api.json -o data/models.json
-	@echo "bundle updated ($$(wc -c < data/models.json) bytes)"
 
 ## Clean build artifacts
 clean:

@@ -9,8 +9,7 @@ pricing.
 [![Go Report Card](https://goreportcard.com/badge/github.com/promptrails/modelsdotdev-go)](https://goreportcard.com/report/github.com/promptrails/modelsdotdev-go)
 
 Typed structs over `https://models.dev/api.json`, an in-memory catalog with
-lookup/filter helpers, an HTTP client with TTL caching, and an embedded offline
-snapshot so it works with no network at all.
+lookup/filter helpers, and an HTTP client with TTL caching.
 
 ```go
 import "github.com/promptrails/modelsdotdev-go"
@@ -36,7 +35,7 @@ Requires Go 1.26+. No third-party dependencies — standard library only.
 
 ### Package-level helpers
 
-Backed by a shared client (live fetch, 1h cache, offline fallback):
+Backed by a shared client (live fetch, 1h cache):
 
 ```go
 model, err := modelsdev.GetModelByID(ctx, "openai:gpt-4o")
@@ -48,7 +47,6 @@ provider, err := modelsdev.GetProviderByName(ctx, "Anthropic")
 ```go
 c := modelsdev.New(
     modelsdev.WithTTL(30*time.Minute),
-    modelsdev.WithOfflineFallback(true),
     modelsdev.WithUserAgent("my-app/1.0"),
 )
 
@@ -62,14 +60,20 @@ for _, m := range cat.Filter(func(m modelsdev.Model) bool {
 }
 ```
 
-`Catalog` serves the last good snapshot if a refetch fails, and (with
-`WithOfflineFallback`) falls back to the embedded snapshot when there is nothing
-cached yet. `Refresh` forces a refetch.
+`Catalog` serves the last good snapshot if a refetch fails. `Refresh` forces a
+refetch.
 
-### Fully offline
+### Bring your own snapshot
+
+The library does not ship a baked-in copy of the catalog — it would be stale the
+moment it's built. If you need catalog data without a network call, fetch a
+snapshot on your own schedule and parse it:
 
 ```go
-cat, err := modelsdev.Bundled() // embedded snapshot, never touches the network
+//go:embed models.json
+var snapshot []byte
+
+cat, err := modelsdev.Parse(snapshot)
 ```
 
 ## Catalog API
@@ -94,12 +98,6 @@ Each `Model` carries its capabilities (`Reasoning`, `ToolCall`, `Attachment`,
 (per-1M-token `Input`, `Output`, `CacheRead`, `CacheWrite`, `Reasoning`, audio,
 and long-context tiers). Cost fields are pointers: `nil` means "not reported",
 which is distinct from a reported zero.
-
-## Updating the offline snapshot
-
-```bash
-make update-bundle   # curls https://models.dev/api.json into data/models.json
-```
 
 ## License
 

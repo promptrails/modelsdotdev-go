@@ -93,19 +93,3 @@ func TestClientErrorNoCache(t *testing.T) {
 		t.Fatal("want error on first fetch failure, got nil")
 	}
 }
-
-func TestClientOfflineFallback(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-	}))
-	defer srv.Close()
-
-	c := New(WithURL(srv.URL), WithOfflineFallback(true))
-	cat, err := c.Catalog(context.Background())
-	if err != nil {
-		t.Fatalf("offline fallback should succeed: %v", err)
-	}
-	if len(cat.Providers) == 0 {
-		t.Error("offline catalog is empty")
-	}
-}

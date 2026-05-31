@@ -1,8 +1,8 @@
-// Command basic prints a few facts from the models.dev catalog using the
-// embedded offline snapshot (no network required).
+// Command basic prints a few facts from the live models.dev catalog.
 package main
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	cat, err := modelsdev.Bundled()
+	cat, err := modelsdev.New().Catalog(context.Background())
 	if err != nil {
 		panic(err)
 	}

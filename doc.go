@@ -3,8 +3,8 @@
 // and pricing.
 //
 // It mirrors the data exposed at https://models.dev/api.json with typed Go
-// structs, an in-memory Catalog with lookup/filter helpers, an HTTP Client with
-// TTL caching, and an embedded offline snapshot for network-free use.
+// structs, an in-memory Catalog with lookup/filter helpers, and an HTTP Client
+// with TTL caching.
 //
 // The quickest start uses the package-level helpers backed by a shared client:
 //
@@ -20,7 +20,8 @@
 //		fmt.Println(m.Provider, m.ID)
 //	}
 //
-// To work entirely offline, use the embedded snapshot directly:
+// To work without a network call, parse a snapshot you manage yourself (read
+// from disk, embedded via go:embed, …):
 //
-//	cat, err := modelsdev.Bundled()
+//	cat, err := modelsdev.Parse(mySnapshotBytes)
 package modelsdev

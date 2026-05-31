@@ -16,7 +16,7 @@ var (
 // who want different behavior should construct their own Client with New.
 func Default() *Client {
 	defaultOnce.Do(func() {
-		defaultClient = New(WithOfflineFallback(true))
+		defaultClient = New()
 	})
 	return defaultClient
 }

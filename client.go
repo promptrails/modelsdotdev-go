@@ -18,11 +18,10 @@ const defaultTTL = time.Hour
 // Client fetches and caches the models.dev catalog. It is safe for concurrent
 // use. The zero value is not usable — construct one with New.
 type Client struct {
-	httpClient      *http.Client
-	url             string
-	userAgent       string
-	ttl             time.Duration
-	offlineFallback bool
+	httpClient *http.Client
+	url        string
+	userAgent  string
+	ttl        time.Duration
 
 	mu        sync.Mutex
 	cache     *Catalog
@@ -66,13 +65,6 @@ func WithTTL(ttl time.Duration) Option {
 	return func(c *Client) { c.ttl = ttl }
 }
 
-// WithOfflineFallback makes Catalog fall back to the embedded snapshot (see
-// Bundled) when a live fetch fails and nothing is cached yet. This trades
-// freshness for availability.
-func WithOfflineFallback(enabled bool) Option {
-	return func(c *Client) { c.offlineFallback = enabled }
-}
-
 // New constructs a Client with the given options.
 func New(opts ...Option) *Client {
 	c := &Client{
@@ -101,12 +93,6 @@ func (c *Client) Catalog(ctx context.Context) (*Catalog, error) {
 	if err != nil {
 		if c.cache != nil {
 			return c.cache, nil // serve stale rather than fail
-		}
-		if c.offlineFallback {
-			if b, berr := Bundled(); berr == nil {
-				c.cache = b
-				return b, nil
-			}
 		}
 		return nil, err
 	}
