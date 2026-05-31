@@ -25,8 +25,10 @@ type Model struct {
 	Name string `json:"name"`
 	// Family groups related models, e.g. "claude-opus".
 	Family string `json:"family,omitempty"`
-	// Provider is the models.dev provider ID this model belongs to.
-	Provider string `json:"provider,omitempty"`
+	// Provider is the models.dev provider ID this model belongs to. It is a
+	// derived back-reference (backfilled from the parent provider), not the
+	// upstream "provider" object, so it is exposed under a distinct JSON key.
+	Provider string `json:"provider_id,omitempty"`
 
 	// Attachment reports whether the model accepts file/image attachments.
 	Attachment bool `json:"attachment"`
@@ -38,10 +40,6 @@ type Model struct {
 	Temperature bool `json:"temperature"`
 	// OpenWeights reports whether the model's weights are openly available.
 	OpenWeights bool `json:"open_weights"`
-	// Interleaved reports whether the model supports interleaved thinking.
-	Interleaved bool `json:"interleaved,omitempty"`
-	// Experimental flags a model as experimental on models.dev.
-	Experimental bool `json:"experimental,omitempty"`
 
 	// StructuredOutput reports native JSON-schema structured output support.
 	// It is a pointer because models.dev omits it for models where it is unknown.
@@ -98,9 +96,16 @@ type Cost struct {
 	// InputAudio / OutputAudio are per-1M-token audio prices, when applicable.
 	InputAudio  *float64 `json:"input_audio,omitempty"`
 	OutputAudio *float64 `json:"output_audio,omitempty"`
-	// ContextOver200K is the input price for context beyond 200K tokens, when
-	// the provider applies long-context pricing.
-	ContextOver200K *float64 `json:"context_over_200k,omitempty"`
+	// ContextOver200K holds the long-context pricing some providers apply to
+	// requests whose context exceeds 200K tokens. Nil when not applicable.
+	ContextOver200K *TierCost `json:"context_over_200k,omitempty"`
+}
+
+// TierCost is the input/output pricing (per 1M tokens, USD) for a specific
+// pricing tier, such as long-context surcharges.
+type TierCost struct {
+	Input  *float64 `json:"input,omitempty"`
+	Output *float64 `json:"output,omitempty"`
 }
 
 // SupportsInput reports whether the model accepts the given input modality.
